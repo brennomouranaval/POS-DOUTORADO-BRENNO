@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gantt Professional - Projeto BR-FORÇA | Pós-Doutorado Brenno Moura Naval</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <h1 class="app-title">
+                    <i class="fas fa-chart-gantt"></i>
+                    Gantt Professional - BR-FORÇA
+                </h1>
+            </div>
+            <div class="header-center">
+                <div class="project-info">
+                    <div class="project-selector">
+                        <input type="text" id="projectName" placeholder="Nome do Projeto" value="Projeto Principal">
+                    </div>
+                    <div class="project-actions">
+                        <button class="btn btn-secondary btn-small" id="newProject" title="Novo Projeto">
+                            <i class="fas fa-file"></i>
+                        </button>
+                        <button class="btn btn-secondary btn-small" id="openProject" title="Abrir Projeto">
+                            <i class="fas fa-folder-open"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="btn btn-secondary" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="saveProject">
+                        <i class="fas fa-save"></i>
+                        Salvar
+                    </button>
+                    <button class="btn btn-primary dropdown-toggle" id="saveDropdown">
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                </div>
+                <button class="btn btn-primary" id="exportMenu">
+                    <i class="fas fa-download"></i>
+                    Exportar
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="sidebar-section">
+                    <h3>Controles do Projeto</h3>
+                    
+                    <!-- Zoom Controls -->
+                    <div class="control-group">
+                        <label>Visualização</label>
+                        <div class="button-group">
+                            <button class="btn btn-small active" data-view="day">Dia</button>
+                            <button class="btn btn-small" data-view="week">Semana</button>
+                            <button class="btn btn-small" data-view="month">Mês</button>
+                        </div>
+                    </div>
+
+                    <!-- Zoom Scale -->
+                    <div class="control-group">
+                        <label>Zoom</label>
+                        <div class="zoom-controls">
+                            <button class="btn btn-icon" id="zoomOut">
+                                <i class="fas fa-search-minus"></i>
+                            </button>
+                            <span id="zoomLevel">100%</span>
+                            <button class="btn btn-icon" id="zoomIn">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Filter Controls -->
+                    <div class="control-group">
+                        <label>Filtros</label>
+                        <div class="filter-controls">
+                            <select id="statusFilter">
+                                <option value="all">Todos os Status</option>
+                                <option value="not-started">Não Iniciado</option>
+                                <option value="in-progress">Em Progresso</option>
+                                <option value="completed">Concluído</option>
+                                <option value="delayed">Atrasado</option>
+                            </select>
+                            <select id="priorityFilter">
+                                <option value="all">Todas as Prioridades</option>
+                                <option value="high">Alta</option>
+                                <option value="medium">Média</option>
+                                <option value="low">Baixa</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Task Form -->
+                <div class="sidebar-section">
+                    <h3>Nova Tarefa</h3>
+                    <form id="taskForm" class="task-form">
+                        <div class="form-group">
+                            <label>Nome da Tarefa</label>
+                            <input type="text" id="taskName" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Descrição</label>
+                            <textarea id="taskDescription" rows="3"></textarea>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Data Início</label>
+                                <input type="date" id="taskStartDate" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Data Fim</label>
+                                <input type="date" id="taskEndDate" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Prioridade</label>
+                                <select id="taskPriority">
+                                    <option value="low">Baixa</option>
+                                    <option value="medium" selected>Média</option>
+                                    <option value="high">Alta</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Progresso (%)</label>
+                                <input type="number" id="taskProgress" min="0" max="100" value="0">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Responsável</label>
+                            <input type="text" id="taskAssignee">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Cor</label>
+                            <div class="color-picker">
+                                <input type="color" id="taskColor" value="#3498db">
+                                <div class="color-presets">
+                                    <div class="color-preset" data-color="#3498db"></div>
+                                    <div class="color-preset" data-color="#e74c3c"></div>
+                                    <div class="color-preset" data-color="#2ecc71"></div>
+                                    <div class="color-preset" data-color="#f39c12"></div>
+                                    <div class="color-preset" data-color="#9b59b6"></div>
+                                    <div class="color-preset" data-color="#1abc9c"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="taskMilestone">
+                                Marco do Projeto
+                            </label>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-plus"></i>
+                                Adicionar Tarefa
+                            </button>
+                            <button type="button" class="btn btn-secondary" id="cancelEdit" style="display: none;">
+                                Cancelar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Project Statistics -->
+                <div class="sidebar-section">
+                    <h3>Estatísticas</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value" id="totalTasks">0</div>
+                            <div class="stat-label">Total de Tarefas</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="completedTasks">0</div>
+                            <div class="stat-label">Concluídas</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="progressPercent">0%</div>
+                            <div class="stat-label">Progresso Geral</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="daysRemaining">-</div>
+                            <div class="stat-label">Dias Restantes</div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Gantt Chart Area -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <div class="chart-controls">
+                        <button class="btn btn-secondary" id="todayBtn">
+                            <i class="fas fa-calendar-day"></i>
+                            Hoje
+                        </button>
+                        <button class="btn btn-secondary" id="fitToScreen">
+                            <i class="fas fa-expand-arrows-alt"></i>
+                            Ajustar à Tela
+                        </button>
+                        <button class="btn btn-secondary" id="resetView">
+                            <i class="fas fa-refresh"></i>
+                            Resetar Visualização
+                        </button>
+                    </div>
+                    <div class="chart-info">
+                        <span id="dateRange">Selecione um período</span>
+                    </div>
+                </div>
+                
+                <div class="gantt-wrapper">
+                    <div class="gantt-sidebar" id="ganttSidebar">
+                        <div class="gantt-header-cell">
+                            <div class="task-header">Tarefas</div>
+                        </div>
+                        <div class="task-list" id="taskList">
+                            <!-- Tasks will be populated here -->
+                        </div>
+                    </div>
+                    
+                    <div class="gantt-main" id="ganttMain">
+                        <div class="gantt-timeline" id="ganttTimeline">
+                            <!-- Timeline will be populated here -->
+                        </div>
+                        <div class="gantt-chart" id="ganttChart">
+                            <!-- Chart bars will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Export Modal -->
+    <div class="modal" id="exportModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Exportar Gráfico de Gantt</h3>
+                <button class="modal-close" id="closeExportModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="export-options">
+                    <div class="export-format">
+                        <h4>Formato</h4>
+                        <div class="button-group">
+                            <button class="btn btn-secondary active" data-format="png">
+                                <i class="fas fa-image"></i>
+                                PNG
+                            </button>
+                            <button class="btn btn-secondary" data-format="svg">
+                                <i class="fas fa-vector-square"></i>
+                                SVG
+                            </button>
+                            <button class="btn btn-secondary" data-format="pdf">
+                                <i class="fas fa-file-pdf"></i>
+                                PDF
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="export-size">
+                        <h4>Tamanho</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Largura (px)</label>
+                                <input type="number" id="exportWidth" value="1920">
+                            </div>
+                            <div class="form-group">
+                                <label>Altura (px)</label>
+                                <input type="number" id="exportHeight" value="1080">
+                            </div>
+                        </div>
+                        <div class="size-presets">
+                            <button class="btn btn-small" data-size="1920x1080">Full HD</button>
+                            <button class="btn btn-small" data-size="1366x768">HD</button>
+                            <button class="btn btn-small" data-size="2560x1440">2K</button>
+                            <button class="btn btn-small" data-size="3840x2160">4K</button>
+                        </div>
+                    </div>
+                    
+                    <div class="export-options-extra">
+                        <label>
+                            <input type="checkbox" id="includeGrid" checked>
+                            Incluir Grade
+                        </label>
+                        <label>
+                            <input type="checkbox" id="includeToday" checked>
+                            Linha do Dia Atual
+                        </label>
+                        <label>
+                            <input type="checkbox" id="includeLabels" checked>
+                            Rótulos das Tarefas
+                        </label>
+                        <label>
+                            <input type="checkbox" id="fullPageLayout">
+                            Layout Completo da Página
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelExport">Cancelar</button>
+                <button class="btn btn-primary" id="confirmExport">
+                    <i class="fas fa-download"></i>
+                    Exportar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Task Detail Modal -->
+    <div class="modal" id="taskModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="taskModalTitle">Detalhes da Tarefa</h3>
+                <button class="modal-close" id="closeTaskModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="taskModalBody">
+                <!-- Task details will be populated here -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="deleteTask">
+                    <i class="fas fa-trash"></i>
+                    Excluir
+                </button>
+                <button class="btn btn-primary" id="editTask">
+                    <i class="fas fa-edit"></i>
+                    Editar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Project Modal -->
+    <div class="modal" id="newProjectModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Novo Projeto</h3>
+                <button class="modal-close" id="closeNewProjectModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="new-project-form">
+                    <div class="form-group">
+                        <label>Nome do Projeto</label>
+                        <input type="text" id="newProjectName" placeholder="Digite o nome do projeto">
+                    </div>
+                    <div class="form-group">
+                        <label>Descrição</label>
+                        <textarea id="newProjectDescription" rows="3" placeholder="Descrição opcional do projeto"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Data de Início</label>
+                            <input type="date" id="newProjectStartDate">
+                        </div>
+                        <div class="form-group">
+                            <label>Data de Término</label>
+                            <input type="date" id="newProjectEndDate">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Template</label>
+                        <select id="newProjectTemplate">
+                            <option value="empty">Projeto Vazio</option>
+                            <option value="sample">Projeto com Dados de Exemplo</option>
+                            <option value="software">Template: Desenvolvimento de Software</option>
+                            <option value="marketing">Template: Campanha de Marketing</option>
+                            <option value="construction">Template: Projeto de Construção</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="saveCurrentProject">
+                            Salvar projeto atual antes de criar novo
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelNewProject">Cancelar</button>
+                <button class="btn btn-primary" id="confirmNewProject">
+                    <i class="fas fa-plus"></i>
+                    Criar Projeto
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Save Options Dropdown -->
+    <div class="dropdown-menu" id="saveDropdownMenu">
+        <div class="dropdown-item" id="saveAs">
+            <i class="fas fa-save"></i>
+            Salvar Como...
+        </div>
+        <div class="dropdown-item" id="saveTemplate">
+            <i class="fas fa-copy"></i>
+            Salvar como Template
+        </div>
+        <div class="dropdown-item" id="autoSaveToggle">
+            <i class="fas fa-clock"></i>
+            Auto-salvamento: <span id="autoSaveStatus">Ativo</span>
+        </div>
+    </div>
+
+    <!-- File Input (Hidden) -->
+    <input type="file" id="fileInput" accept=".json" style="display: none;">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <!-- Embedded Project Data -->
+    <script>
+        // Embedded project data for BR-FORÇA to ensure it always loads
+        window.PROJETO_BR_FORCA_DATA = {
+            "tasks": [
+                {
+                    "id": 1759365443864,
+                    "name": "Início do Projeto BR-FORÇA",
+                    "description": "",
+                    "startDate": "2025-12-01T00:00:00.000Z",
+                    "endDate": "2025-12-01T00:00:00.000Z",
+                    "priority": "medium",
+                    "progress": 0,
+                    "assignee": "Brenno",
+                    "color": "#f39c12",
+                    "milestone": true,
+                    "status": "not-started"
+                },
+                {
+                    "id": 1759365554415,
+                    "name": "Levantamentos bibliográficos de modelos de inteligência artificial ",
+                    "description": "3.1.1.\tRealizar levantamentos bibliográficos sobre modelos de inteligência artificial aplicados na calibração de modelos numéricos, e sobre técnicas de aprendizado profundo para o sensoriamento virtual utilizando apenas medições de campo",
+                    "startDate": "2025-12-01T00:00:00.000Z",
+                    "endDate": "2026-01-30T00:00:00.000Z",
+                    "priority": "medium",
+                    "progress": 0,
+                    "assignee": "Primeiro Estágio",
+                    "color": "#3498db",
+                    "milestone": false,
+                    "status": "not-started"
+                },
+                {
+                    "id": 1759365642271,
+                    "name": "Estudo bibliográfico de dinâmica de sistemas offshore e tubulações",
+                    "description": "3.1.2.\tFazer um estudo bibliográfico sobre os fenômenos envolvidos ma dinâmica de sistemas offshore e tubulações, em diferentes regimes, bem como um levantamento das técnicas que podem ser utilizadas no processo de redução de modelos em elementos finitos (MEF)",
+                    "startDate": "2026-01-15T00:00:00.000Z",
+                    "endDate": "2026-04-30T00:00:00.000Z",
+                    "priority": "medium",
+                    "progress": 0,
+                    "assignee": "Primeiro Estágio",
+                    "color": "#3498db",
+                    "milestone": false,
+                    "status": "not-started"
+                },
+                {
+                    "id": 1759366253677,
+                    "name": "Levantamento de dados e parâmetros de sistemas",
+                    "description": "3.2.1.\tLevantamento de dados e parâmetros de sistemas a serem monitorados para estabelecimento de uma base de dados preliminar",
+                    "startDate": "2026-04-30T00:00:00.000Z",
+                    "endDate": "2026-06-30T00:00:00.000Z",
+                    "priority": "medium",
+                    "progress": 0,
+                    "assignee": "Segundo Estágio",
+                    "color": "#2ecc71",
+                    "milestone": false,
+                    "status": "not-started"
+                },
+                {
+                    "id": 1759366351949,
+                    "name": "Modelar ou utilizar os modelos de elementos finitos (MEF",
+                    "description": "Modelar ou utilizar os modelos de elementos finitos (MEF) desenvolvidos utilizando o software comercial ANSYS",
+                    "startDate": "2026-06-22T00:00:00.000Z",
+                    "endDate": "2026-07-15T00:00:00.000Z",
+                    "priority": "medium",
+                    "progress": 0,
+                    "assignee": "Segundo Estágio",
+                    "color": "#2ecc71",
+                    "milestone": false,
+                    "status": "not-started"
+                },
+                {
+                    "id": 1759366578004,
+                    "name": "Realizar redução do modelo utilizando  GUYAN",
+                    "description": "3.2.3.\tRealizar a primeira redução do modelo (redução parcial) utilizando o método de GUYAN (implementado no ANSYS) até um número de graus de liberdade manipulável. Utilizar o critério do MAC para verificar se a redução realizada representa o modelo completo",
+                    "startDate": "2026-06-22T00:00:00.000Z",
+                    "endDate": "2026-07-30T00:00:00.000Z",
+                    "priority": "medium",
+                    "progress": 0,
+                    "assignee": "Segundo Estágio",
+                    "color": "#2ecc71",
+                    "milestone": false,
+                    "status": "not-started"
+                },
+                {
+                    "id": 1759366703443,
+                    "name": "Exportar as matrizes de rigidez e massa reduzidas",
+                    "description": "Exportar as matrizes de rigidez e massa reduzidas do ANSYS para pós-processamento",
+                    "startDate": "2026-07-01T00:00:00.000Z",
+                    "endDate": "2026-08-03T00:00:00.000Z",
+                    "priority": "medium",
+                    "progress": 0,
+                    "assignee": "Segundo Estágio",
+                    "color": "#2ecc71",
+                    "milestone": false,
+                    "status": "not-started"
+                },
+                {
+                    "id": 1759366759227,
+                    "name": "Realizar a segunda redução (redução final)",
+                    "description": "Realizar a segunda redução (redução final) utilizando o método SEREP para compatibilizar o número de graus de liberdade, e na faixa de frequência de interesse, com o número de sensores a serem utilizados na monitoração da estrutura real. Utilizar o critério do MAC para verificar se a redução final representa o modelo completo",
+                    "startDate": "2026-07-01T00:00:00.000Z",
+                    "endDate": "2026-08-21T00:00:00.000Z",
+                    "priority": "medium",
+                    "progress": 0,
+                    "assignee": "Segundo Estágio",
+                    "color": "#2ecc71",
+                    "milestone": false,
+                    "status": "not-started"
+                },
+                {
+                    "id": 1759366910140,
+                    "name": "Medições Experimentais",
+                    "description": "Fazer medições (ou obter os dados) de vibração e de deformação no(s) sistema(s) escolhido(s)",
+                    "startDate": "2026-08-21T00:00:00.000Z",
+                    "endDate": "2026-10-30T00:00:00.000Z",
+                    "priority": "medium",
+                    "progress": 0,
+                    "assignee": "Terceiro Estágio",
+                    "color": "#9b59b6",
+                    "milestone": false,
+                    "status": "not-started"
+                },
+                {
+                    "id": 1759366980842,
+                    "name": "Identificação de Sistemas Estocásticos (SSI)",
+                    "description": "Utilizando métodos de Identificação de Sistemas Estocásticos (SSI), realizar a identificação dos parâmetros modais e extrair a matriz modal experimental na faixa de frequência de interesse",
+                    "startDate": "2026-10-30T00:00:00.000Z",
+                    "endDate": "2026-11-09T00:00:00.000Z",
+                    "priority": "medium",
+                    "progress": 0,
+                    "assignee": "Terceiro Estágio",
+                    "color": "#9b59b6",
+                    "milestone": false,
+                    "status": "not-started"
+                },
+                {
+                    "id": 1759367077946,
+                    "name": "Calibração do modelo",
+                    "description": "Utilizando a matriz modal experimental e a matriz modal reduzida e realizar a calibração do modelo modal utilizando técnicas de inteligência artificial",
+                    "startDate": "2026-11-10T00:00:00.000Z",
+                    "endDate": "2026-11-27T00:00:00.000Z",
+                    "priority": "medium",
+                    "progress": 0,
+                    "assignee": "Terceiro Estágio",
+                    "color": "#9b59b6",
+                    "milestone": false,
+                    "status": "not-started"
+                },
+                {
+                    "id": 1759367147586,
+                    "name": "Expansão para os graus de liberdade de interesse",
+                    "description": "Com a matriz modal calibrada, realiza-se a expansão para os graus de liberdade de interesse. Criam-se as bases modais de forma a escolher os conjuntos ótimos de modos de vibração e acelerômetros (utilizando técnicas de inteligência artificial) necessários para a estimativa",
+                    "startDate": "2026-11-27T00:00:00.000Z",
+                    "endDate": "2026-12-31T00:00:00.000Z",
+                    "priority": "medium",
+                    "progress": 0,
+                    "assignee": "Terceiro Estágio",
+                    "color": "#9b59b6",
+                    "milestone": false,
+                    "status": "not-started"
+                },
+                {
+                    "id": 1759367251410,
+                    "name": "Machine Learning para estimativa de carregamentos",
+                    "description": "Utilizar algoritmos de aprendizado de máquina para fazer a estimativa dos carregamentos e sua distribuição espacial ao longo da tubulação, sem utilizar a base modal calibrada",
+                    "startDate": "2026-12-31T00:00:00.000Z",
+                    "endDate": "2027-02-28T00:00:00.000Z",
+                    "priority": "medium",
+                    "progress": 0,
+                    "assignee": "Terceiro Estágio",
+                    "color": "#9b59b6",
+                    "milestone": false,
+                    "status": "not-started"
+                },
+                {
+                    "id": 1759367383553,
+                    "name": "Estudo de vida útil à fadiga",
+                    "description": "A partir da predição dos sinais de deformação e de vibração, e dos carregamentos estimados, será realizado o estudo de vida útil à fadiga nos componentes de maior risco",
+                    "startDate": "2027-02-28T00:00:00.000Z",
+                    "endDate": "2027-04-30T00:00:00.000Z",
+                    "priority": "medium",
+                    "progress": 0,
+                    "assignee": "Quarto Estágio",
+                    "color": "#e74c3c",
+                    "milestone": false,
+                    "status": "not-started"
+                },
+                {
+                    "id": 1759367485449,
+                    "name": "Testes em laboratório numa viga retangular",
+                    "description": "Como forma de validar a metodologia implementada no BR-FORÇA, serão realizados testes em laboratório numa viga retangular submetida a carregamentos dinâmicos, onde essas forças de excitação serão medidas experimentalmente e comparadas com as estimadas pela metodologia proposta",
+                    "startDate": "2027-04-30T00:00:00.000Z",
+                    "endDate": "2027-05-31T00:00:00.000Z",
+                    "priority": "medium",
+                    "progress": 0,
+                    "assignee": "Quarto Estágio",
+                    "color": "#e74c3c",
+                    "milestone": false,
+                    "status": "not-started"
+                },
+                {
+                    "id": 1759367546913,
+                    "name": "Coleta ede de tubulação do segundo estágio de um compressor alternativo",
+                    "description": "Como aplicação da metodologia em estruturas reais, será utilizado como caso de estudo os dados coletados na rede de tubulação do segundo estágio de um compressor alternativo",
+                    "startDate": "2027-05-31T00:00:00.000Z",
+                    "endDate": "2027-07-30T00:00:00.000Z",
+                    "priority": "medium",
+                    "progress": 0,
+                    "assignee": "Quarto Estágio",
+                    "color": "#e74c3c",
+                    "milestone": false,
+                    "status": "not-started"
+                },
+                {
+                    "id": 1759367686208,
+                    "name": "Desenvolvimento do Backend do BR-Força",
+                    "description": "Consolidação dos resultados, metodologias e formação do backend",
+                    "startDate": "2027-07-28T00:00:00.000Z",
+                    "endDate": "2027-11-30T00:00:00.000Z",
+                    "priority": "medium",
+                    "progress": 0,
+                    "assignee": "Produto BR-FORÇA",
+                    "color": "#1abc9c",
+                    "milestone": false,
+                    "status": "not-started"
+                },
+                {
+                    "id": 1759367769832,
+                    "name": "Desenvolvimento do Frontend do BR-FORÇA",
+                    "description": "Desenvolvimento da interface do sistema BR-FORÇA",
+                    "startDate": "2027-11-30T00:00:00.000Z",
+                    "endDate": "2028-02-03T00:00:00.000Z",
+                    "priority": "medium",
+                    "progress": 0,
+                    "assignee": "Produto BR-Força",
+                    "color": "#1abc9c",
+                    "milestone": false,
+                    "status": "not-started"
+                },
+                {
+                    "id": 1759368187126,
+                    "name": "Integração Frontend e Backend",
+                    "description": "Integração de todas as funcionalidades do software BR-FORÇA",
+                    "startDate": "2028-02-02T00:00:00.000Z",
+                    "endDate": "2028-04-30T00:00:00.000Z",
+                    "priority": "medium",
+                    "progress": 0,
+                    "assignee": "Produto BR-Força",
+                    "color": "#1abc9c",
+                    "milestone": false,
+                    "status": "not-started"
+                },
+                {
+                    "id": 1759368339870,
+                    "name": "Correção de Bugs e Documentação",
+                    "description": "",
+                    "startDate": "2028-04-30T00:00:00.000Z",
+                    "endDate": "2028-06-30T00:00:00.000Z",
+                    "priority": "medium",
+                    "progress": 0,
+                    "assignee": "Produto BR-Força",
+                    "color": "#1abc9c",
+                    "milestone": false,
+                    "status": "not-started"
+                },
+                {
+                    "id": 1759368415046,
+                    "name": "Treinamento, capacitação e adequação final",
+                    "description": "",
+                    "startDate": "2028-06-30T00:00:00.000Z",
+                    "endDate": "2028-09-30T00:00:00.000Z",
+                    "priority": "medium",
+                    "progress": 0,
+                    "assignee": "Produto BR-Força",
+                    "color": "#1abc9c",
+                    "milestone": false,
+                    "status": "not-started"
+                },
+                {
+                    "id": 1759368524613,
+                    "name": "Produção do relatório final de Pós-Doutorado",
+                    "description": "",
+                    "startDate": "2028-09-30T00:00:00.000Z",
+                    "endDate": "2028-11-30T00:00:00.000Z",
+                    "priority": "medium",
+                    "progress": 0,
+                    "assignee": "Brenno",
+                    "color": "#3498db",
+                    "milestone": false,
+                    "status": "not-started"
+                },
+                {
+                    "id": 1759368585229,
+                    "name": "Fim do Projeto BR-Força",
+                    "description": "",
+                    "startDate": "2028-12-31T00:00:00.000Z",
+                    "endDate": "2028-12-31T00:00:00.000Z",
+                    "priority": "medium",
+                    "progress": 0,
+                    "assignee": "FIm do projeto",
+                    "color": "#f39c12",
+                    "milestone": true,
+                    "status": "not-started"
+                }
+            ],
+            "settings": {
+                "theme": "dark",
+                "currentView": "month",
+                "zoomLevel": 0.5
+            },
+            "timestamp": "2025-10-02T01:38:40.035Z"
+        };
+        
+        console.log("✓ Dados completos do projeto BR-FORÇA embedados carregados:", window.PROJETO_BR_FORCA_DATA.tasks.length, "tarefas");
+    </script>
+    
+    <script src="script.js"></script>
+</body>
+</html>
